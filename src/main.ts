@@ -84,12 +84,12 @@ console.log(
 );
 
 console.log(
-  "Получение стоимости всех товаров в корзине",
+  "Получение стоимости всех товаров в корзине ",
   bucketProducts.getFullBucketPrice(),
 );
 
 console.log(
-  "Получение списка количества товаров в корзине",
+  "Получение списка количества товаров в корзине ",
   bucketProducts.getQuantityBucketProducts(),
 );
 
@@ -99,7 +99,7 @@ console.log(
 );
 
 console.log(
-  "Удаление всех товаров с корзины после покупки",
+  "Удаление всех товаров с корзины после покупки ",
   bucketProducts.deleteAllSelectedProductsFromBucket(),
 );
 
@@ -124,7 +124,7 @@ console.log(
 
 console.log("Проверка валидации введенных значений ", customer.validateForm());
 
-//API
+//Api
 
 customer.setInputData("payment", "card");
 customer.setInputData("email", "test-user@mail.ru");
