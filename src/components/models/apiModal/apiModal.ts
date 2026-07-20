@@ -7,11 +7,11 @@ export class ApiModal {
     this.api = api;
   }
 
-  getProductsList(): Promise<IProductResponse> {
+  public getProductsList(): Promise<IProductResponse> {
     return this.api.get<IProductResponse>("/product");
   }
 
-  postOrder(order: IOrder): Promise<IOrderResult> {
+  public postOrder(order: IOrder): Promise<IOrderResult> {
     return this.api.post<IOrderResult>("/order", order, "POST");
   }
 }

@@ -1,16 +1,11 @@
-import { ICustomer, TPayment } from "../../../types";
+import { ICustomer, TPayment, TFormErrors } from "../../../types";
 
 export class Customer {
-  private payment: TPayment;
-  private email: string;
-  private phone: string;
-  private address: string;
-  constructor(customer: ICustomer) {
-    this.payment = customer.payment;
-    this.email = customer.email;
-    this.phone = customer.phone;
-    this.address = customer.address;
-  }
+  private payment: TPayment = null;
+  private email: string = "";
+  private phone: string = "";
+  private address: string = "";
+  constructor() {}
 
   getAllCustomerData(): ICustomer {
     return {
@@ -21,23 +16,20 @@ export class Customer {
     };
   }
   deleteAllCustomerData(): void {
-    this.payment = "" as TPayment;
+    this.payment = null;
     this.email = "";
     this.phone = "";
     this.address = "";
   }
-  validateForm(): Partial<Record<keyof ICustomer, string>> {
-    const errors: Partial<Record<keyof ICustomer, string>> = {};
+  validateForm(): TFormErrors {
+    const errors: TFormErrors = {};
 
     if (!this.payment) {
       errors.payment = "Не выбран вид оплаты";
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!this.email) {
       errors.email = "Укажите email";
-    } else if (!emailRegex.test(this.email)) {
-      errors.email = "Неверный формат почты";
     }
 
     const cleanPhone = this.phone.replace(/\D/g, "");
@@ -54,7 +46,17 @@ export class Customer {
     return errors;
   }
 
+  validPayments: TPayment[] = ["card", "cash", null];
+
   setInputData(field: keyof ICustomer, value: string | TPayment): void {
-    (this as any)[field] = value;
+    if (field === "payment") {
+      if (!this.validPayments.includes(value as TPayment)) {
+        console.log(`Невалидное значение для payment: ${value}`);
+        return;
+      }
+      this.payment = value as TPayment;
+    } else {
+      (this as any)[field] = value;
+    }
   }
 }

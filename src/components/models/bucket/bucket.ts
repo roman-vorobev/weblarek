@@ -1,13 +1,13 @@
 import { IProduct } from "../../../types";
 
 export class Bucket {
-  selectedProducts: IProduct[];
-  constructor(selectedProduct: IProduct[]) {
-    this.selectedProducts = selectedProduct;
+  private selectedProducts: IProduct[] = [];
+  constructor() {
+    this.selectedProducts = [];
   }
 
   getBucketProducts(): IProduct[] {
-    return this.selectedProducts ?? [];
+    return this.selectedProducts;
   }
   setSelectedProductIntoBucket(product: IProduct): void {
     this.selectedProducts.push(product);
@@ -15,7 +15,7 @@ export class Bucket {
 
   deleteSelectedProductFromBucket(id: string): void {
     if (this.selectedProducts) {
-      this.selectedProducts = this.selectedProducts?.filter(
+      this.selectedProducts = this.selectedProducts.filter(
         (product) => product.id !== id,
       );
     }

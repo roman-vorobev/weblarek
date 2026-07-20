@@ -4,62 +4,41 @@ import { Catalog } from "./components/models/catalog/catalog";
 import { Bucket } from "./components/models/bucket/bucket";
 import { Customer } from "./components/models/customer/customer";
 import { ApiModal } from "./components/models/apiModal/apiModal";
-import { IProduct, ICustomer, IOrder } from "./types";
+import { IProduct, IOrder } from "./types";
 import { API_URL } from "./utils/constants";
 import { Api } from "./components/base/Api";
+import { apiProducts } from "./utils/data";
 
-const productsModel = new Catalog([]);
+const productsModel = new Catalog();
 
-const customerData: ICustomer = {
-  payment: "card",
-  email: "",
-  phone: "",
-  address: "",
-};
+const customer = new Customer();
 
-const customer = new Customer(customerData);
+const bucketProducts = new Bucket();
 
-const bucketProducts = new Bucket([]);
-
-const apiProducts: IProduct[] = [
-  {
-    id: "1",
-    title: "Кошачья лапка",
-    description: "Просто лапка",
-    price: 100,
-    image: "",
-    productType: "Другое",
-  },
-  {
-    id: "2",
-    title: "Кроличья лапка",
-    description: "Дает удачу",
-    price: 200,
-    image: "",
-    productType: "Дополнительное",
-  },
-];
+const apiProductsList: IProduct[] = apiProducts.items;
 
 const baseApi = new Api(API_URL);
 
 const apiModal = new ApiModal(baseApi);
 
 //Products
-console.log(
-  "Получение списка товаров ",
-  productsModel.saveProducts(apiProducts),
-);
+productsModel.saveProducts(apiProductsList);
 
 const productList = productsModel.getProducts();
+
 console.log("Отображение списка товаров ", productList);
-const selectedProduct = productsModel.getProductByID("1");
+
+const selectedProduct = productsModel.getProductByID(
+  "c101ab44-ed99-4a54-990d-47aa2bb4e7d9",
+);
+
 console.log("Поиск товара по ID ", selectedProduct);
+
 if (selectedProduct) {
-  console.log(
-    "Отображение карточки продукта ",
-    productsModel.saveProduct(selectedProduct?.id),
-  );
+  productsModel.saveProduct(selectedProduct.id);
 }
+
+productsModel.saveProducts(apiProductsList);
 
 console.log("Получить выбранный товар ", productsModel.getSelectedProduct());
 
@@ -70,17 +49,18 @@ console.log(
   bucketProducts.getBucketProducts(),
 );
 
-const selectedProductIntoBucket = bucketProducts.setSelectedProductIntoBucket(
-  apiProducts[0],
-);
+bucketProducts.setSelectedProductIntoBucket(apiProductsList[0]);
+bucketProducts.setSelectedProductIntoBucket(apiProductsList[2]);
+bucketProducts.setSelectedProductIntoBucket(apiProductsList[1]);
+
 console.log(
-  "Отображение выбранного товара в корзину ",
-  selectedProductIntoBucket,
+  "Отображение товаров в корзине ",
+  bucketProducts.getBucketProducts(),
 );
 
 console.log(
   "Проверить наличие товара в корзине ",
-  bucketProducts.getProductInBucket("1"),
+  bucketProducts.getProductInBucket("b06cde61-912f-4663-9751-09956c0eed67"),
 );
 
 console.log(
@@ -89,38 +69,43 @@ console.log(
 );
 
 console.log(
-  "Получение списка количества товаров в корзине ",
+  "Получение количества товаров в корзине ",
   bucketProducts.getQuantityBucketProducts(),
 );
 
-console.log(
-  "Удаление товара с корзины ",
-  bucketProducts.deleteSelectedProductFromBucket("1"),
+bucketProducts.deleteSelectedProductFromBucket(
+  "b06cde61-912f-4663-9751-09956c0eed67",
 );
 
 console.log(
-  "Удаление всех товаров с корзины после покупки ",
-  bucketProducts.deleteAllSelectedProductsFromBucket(),
+  "Получение списка товаров в корзине после удаления ",
+  bucketProducts.getBucketProducts(),
 );
+
+(bucketProducts.deleteAllSelectedProductsFromBucket(),
+  console.log(
+    "Получение списка товаров в корзине после удаления всех товаров ",
+    bucketProducts.getBucketProducts(),
+  ));
 
 console.log(
   "Проверить наличие товара в корзине ",
-  bucketProducts.getProductInBucket("1"),
+  bucketProducts.getProductInBucket("b06cde61-912f-4663-9751-09956c0eed67"),
 );
 
 //Customer
 
+customer.setInputData("phone", "111111111111");
+
 console.log("Получить все данные покупателя ", customer.getAllCustomerData());
 
-console.log(
-  "Удалить все данные пользователя ",
-  customer.deleteAllCustomerData(),
-);
+(customer.deleteAllCustomerData(),
+  console.log(
+    "Получить все данные покупателя после удаления ",
+    customer.getAllCustomerData(),
+  ));
 
-console.log(
-  "Ввести данные в поле, например в поле 'Телефон' ",
-  customer.setInputData("phone", "111111111111"),
-);
+customer.setInputData("email", "test@test.ru");
 
 console.log("Проверка валидации введенных значений ", customer.validateForm());
 
@@ -138,7 +123,14 @@ const realProductFromServer = response.items[5];
 
 bucketProducts.setSelectedProductIntoBucket(realProductFromServer);
 
-console.log("Список товаров ", await apiModal.getProductsList());
+async function getBucketList() {
+  try {
+    const response = await apiModal.getProductsList();
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}
 
 const orderData: IOrder = {
   ...customer.getAllCustomerData(),
@@ -148,6 +140,17 @@ const orderData: IOrder = {
   items: bucketProducts.getBucketProducts().map((product) => product.id),
 };
 
-const postOrderApi = await apiModal.postOrder(orderData);
+async function getOrderList() {
+  try {
+    const response = await apiModal.postOrder(orderData);
+    return response;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+console.log("Список товаров ", getBucketList());
+
+const postOrderApi = getOrderList();
 
 console.log("Выбранные товары ", postOrderApi);
