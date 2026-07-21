@@ -1,6 +1,9 @@
 import { IProduct } from "../../../types";
 
 export class Bucket {
+  getSelectedProductInfoBucket(): any {
+    throw new Error("Method not implemented.");
+  }
   private selectedProducts: IProduct[] = [];
   constructor() {
     this.selectedProducts = [];

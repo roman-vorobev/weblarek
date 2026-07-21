@@ -123,9 +123,15 @@ const realProductFromServer = response.items[5];
 
 bucketProducts.setSelectedProductIntoBucket(realProductFromServer);
 
-async function getBucketList() {
+async function getItemsList() {
   try {
     const response = await apiModal.getProductsList();
+    productsModel.saveProducts(response.items);
+
+    console.log(
+      "Список продуктов из модели каталога: ",
+      productsModel.getProducts(),
+    );
     return response;
   } catch (error) {
     console.log(error);
@@ -149,7 +155,7 @@ async function getOrderList() {
   }
 }
 
-console.log("Список товаров ", getBucketList());
+console.log("Список товаров ", getItemsList());
 
 const postOrderApi = getOrderList();
 

@@ -135,7 +135,7 @@ category - Тип товара. Поле нужно для отображени�
 Корзина будет состоять из следующих полей. Нужно для использования ордера на покупку товаров
 
 export interface ICustomer {
-payment: TPayment;
+payment: TPayment | null;
 email: string;
 phone: string;
 address: string;

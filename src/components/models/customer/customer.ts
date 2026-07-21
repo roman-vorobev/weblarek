@@ -1,7 +1,7 @@
 import { ICustomer, TPayment, TFormErrors } from "../../../types";
 
 export class Customer {
-  private payment: TPayment = null;
+  private payment: TPayment | null = null;
   private email: string = "";
   private phone: string = "";
   private address: string = "";
@@ -32,11 +32,8 @@ export class Customer {
       errors.email = "Укажите email";
     }
 
-    const cleanPhone = this.phone.replace(/\D/g, "");
     if (!this.phone.trim()) {
       errors.phone = "Укажите номер телефона";
-    } else if (cleanPhone.length !== 11) {
-      errors.phone = "Номер телефона должен содержать 11 цифр";
     }
 
     if (!this.address.trim()) {
@@ -46,7 +43,7 @@ export class Customer {
     return errors;
   }
 
-  validPayments: TPayment[] = ["card", "cash", null];
+  validPayments: TPayment[] = ["card", "cash"];
 
   setInputData(field: keyof ICustomer, value: string | TPayment): void {
     if (field === "payment") {

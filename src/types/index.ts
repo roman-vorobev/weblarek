@@ -9,7 +9,7 @@ export interface IApi {
   ): Promise<T>;
 }
 
-export type TPayment = "card" | "cash" | null;
+export type TPayment = "card" | "cash";
 
 export type TFormErrors = Partial<Record<keyof ICustomer, string>>;
 
@@ -23,7 +23,7 @@ export interface IProduct {
 }
 
 export interface ICustomer {
-  payment: TPayment;
+  payment: TPayment | null;
   email: string;
   phone: string;
   address: string;
