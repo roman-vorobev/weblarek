@@ -1,6 +1,6 @@
-import { Component } from "../base/Component";
-import { IEvents } from "../base/Events";
-import { ensureElement } from "../../utils/utils";
+import { Component } from "../../base/Component";
+import { IEvents } from "../../base/Events";
+import { ensureElement } from "../../../utils/utils";
 
 interface IBucketViewData {
   items: HTMLElement[];
@@ -24,7 +24,7 @@ export class BucketView extends Component<IBucketViewData> {
 
     if (this._button) {
       this._button.addEventListener("click", () => {
-        events.emit("basket:order");
+        events.emit("order:open");
       });
     }
   }
@@ -46,9 +46,5 @@ export class BucketView extends Component<IBucketViewData> {
     if (this._price) {
       this._price.textContent = `${value} синапсов`;
     }
-  }
-  render(data: Partial<IBucketViewData>): HTMLElement {
-    super.render(data);
-    return this.container;
   }
 }

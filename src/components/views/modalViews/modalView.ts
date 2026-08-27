@@ -1,6 +1,6 @@
 // src/components/views/modalView.ts
-import { Component } from "../base/Component";
-import { ensureElement } from "../../utils/utils";
+import { Component } from "../../base/Component";
+import { ensureElement } from "../../../utils/utils";
 
 interface IModalData {
   content: HTMLElement;

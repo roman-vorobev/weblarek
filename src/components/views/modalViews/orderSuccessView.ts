@@ -1,6 +1,6 @@
-import { Component } from "../base/Component";
-import { ensureElement } from "../../utils/utils";
-import { IEvents } from "../base/Events";
+import { Component } from "../../base/Component";
+import { ensureElement } from "../../../utils/utils";
+import { IEvents } from "../../base/Events";
 
 interface IOrderSuccessData {
   total: number;
@@ -27,10 +27,9 @@ export class OrderSuccessView extends Component<IOrderSuccessData> {
     });
   }
 
-  render(data: Partial<IOrderSuccessData>): HTMLElement {
-    if (data.total !== undefined && this._description) {
-      this._description.textContent = `Списано ${data.total} синапсов`;
+  set total(value: number) {
+    if (this._description) {
+      this._description.textContent = `Списано ${value} синапсов`;
     }
-    return this.container;
   }
 }

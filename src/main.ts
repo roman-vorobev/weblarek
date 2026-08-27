@@ -7,75 +7,48 @@ import { ApiModal } from "./components/models/apiModal/apiModal";
 import { IOrder } from "./types";
 import { API_URL } from "./utils/constants";
 import { Api } from "./components/base/Api";
-import { CatalogView } from "./components/views/catalogView";
-import { modalView } from "./components/views/modalView";
-import { CardPreview } from "./components/views/cardPreview";
-import { BucketView } from "./components/views/bucketView";
+import { CardCatalogView } from "./components/views/cardCatalogView";
+import { modalView } from "./components/views/modalViews/modalView";
+import { CardPreview } from "./components/views/modalViews/cardPreview";
+import { BucketView } from "./components/views/modalViews/bucketView";
 import { BucketItemView } from "./components/views/bucketItemView";
-import { OrderView } from "./components/views/orderView";
-import { ContactsView } from "./components/views/contactsView";
-import { OrderSuccessView } from "./components/views/orderSuccessView";
+import { OrderView } from "./components/views/modalViews/orderView";
+import { ContactsView } from "./components/views/modalViews/contactsView";
+import { OrderSuccessView } from "./components/views/modalViews/orderSuccessView";
+import { Header } from "./components/views/header";
+import { ensureElement } from "./utils/utils";
+import { Gallery } from "./components/views/gallery";
 
 const events = new EventEmitter();
-const productsModel = new Catalog();
-const customer = new Customer();
-const bucketProducts = new Bucket();
+const productsModel = new Catalog(events);
+const customer = new Customer(events);
+const bucketProducts = new Bucket(events);
 
 const baseApi = new Api(API_URL);
 const apiModal = new ApiModal(baseApi);
-const catalogView = new CatalogView(events);
 
-const modalContainer = document.querySelector(
-  "#modal-container",
-) as HTMLElement;
-const modal = new modalView(modalContainer);
-
-const bucketCounter = document.querySelector(
-  ".header__basket-counter",
-) as HTMLElement;
-const bucketButtonHeader = document.querySelector(
-  ".header__basket",
-) as HTMLButtonElement;
-
-const cardPreviewTemplate = document.querySelector(
-  "#card-preview",
-) as HTMLTemplateElement;
-const bucketTemplate = document.querySelector("#basket") as HTMLTemplateElement;
-const cardBucketTemplate = document.querySelector(
-  "#card-basket",
-) as HTMLTemplateElement;
-
-const orderTemplate = document.querySelector("#order") as HTMLTemplateElement;
-
-const contactsTemplate = document.querySelector(
-  "#contacts",
-) as HTMLTemplateElement;
-const successTemplate = document.querySelector(
-  "#success",
-) as HTMLTemplateElement;
+const header = new Header(ensureElement(".header"), events);
+const gallery = new Gallery(ensureElement(".gallery"));
+const modal = new modalView(ensureElement("#modal-container"));
+const cardCatalogTemplate = ensureElement<HTMLTemplateElement>("#card-catalog");
+const bucketButtonHeader = ensureElement<HTMLButtonElement>(".header__basket");
+const cardPreviewTemplate = ensureElement<HTMLTemplateElement>("#card-preview");
+const bucketTemplate = ensureElement<HTMLTemplateElement>("#basket");
+const cardBucketTemplate = ensureElement<HTMLTemplateElement>("#card-basket");
+const orderTemplate = ensureElement<HTMLTemplateElement>("#order");
+const contactsTemplate = ensureElement<HTMLTemplateElement>("#contacts");
+const successTemplate = ensureElement<HTMLTemplateElement>("#success");
 
 let contactsViewInstance: ContactsView | null = null;
 let orderViewInstance: OrderView | null = null;
 
-function updateBucketCounter() {
-  if (bucketCounter) {
-    bucketCounter.textContent = String(
-      bucketProducts.getQuantityBucketProducts(),
-    );
-  }
+function updateHeaderCounter() {
+  header.render({
+    counter: bucketProducts.getQuantityBucketProducts(),
+  });
 }
 
-events.on<{ id: string }>("basket:delete-item", (data) => {
-  bucketProducts.deleteSelectedProductFromBucket(data.id);
-  updateBucketCounter();
-  events.emit("basket:open");
-});
-
-events.on("basket:order", () => {
-  events.emit("order:open");
-});
-
-events.on<{ id: string }>("preview:basket-toggle", (data) => {
+events.on<{ id: string }>("preview:bucket-toggle", (data) => {
   const selected = productsModel.getProducts().find((p) => p.id === data.id);
   if (!selected) return;
 
@@ -87,7 +60,7 @@ events.on<{ id: string }>("preview:basket-toggle", (data) => {
     bucketProducts.setSelectedProductIntoBucket(selected);
   }
 
-  updateBucketCounter();
+  updateHeaderCounter();
   modal.close();
 });
 
@@ -101,30 +74,23 @@ events.on<{ id: string }>("card:select", (data) => {
     ) as HTMLElement;
     const cardRoot = templateContent.querySelector(".card") as HTMLElement;
 
-    const cardPreview = new CardPreview(cardRoot, events);
+    const cardPreview = new CardPreview(cardRoot, () => {
+      events.emit("preview:bucket-toggle", { id: selected.id });
+    });
     const initialInBucket = bucketProducts.getProductInBucket(selected.id);
 
     modal.render({
       content: cardPreview.render({
-        id: selected.id,
         title: selected.title,
         image: selected.image,
         category: selected.category,
         description: selected.description,
         price: selected.price,
         isInBucket: initialInBucket,
-      }),
+      } as Record<string, unknown>),
     });
 
     modal.open();
-  }
-});
-
-events.on<{ field: string; value: string }>("contacts:input", (data) => {
-  customer.setInputData(data.field as any, data.value);
-  const errors = customer.validateForm();
-  if (contactsViewInstance) {
-    contactsViewInstance.setErrors(errors);
   }
 });
 
@@ -147,10 +113,30 @@ events.on("contacts:submit", async () => {
 
 events.on<{ field: string; value: string }>("order:input", (data) => {
   customer.setInputData(data.field as any, data.value);
+});
 
+events.on<{ field: string; value: string }>("contacts:input", (data) => {
+  customer.setInputData(data.field as any, data.value);
+});
+
+events.on("customer-data:changed", () => {
+  const customerData = customer.getAllCustomerData();
   const errors = customer.validateForm();
+
   if (orderViewInstance) {
+    orderViewInstance.render({
+      address: customerData.address,
+      payment: customerData.payment,
+    } as Record<string, unknown>);
     orderViewInstance.setErrors(errors);
+  }
+
+  if (contactsViewInstance) {
+    contactsViewInstance.render({
+      phone: customerData.phone,
+      email: customerData.email,
+    } as Record<string, unknown>);
+    contactsViewInstance.setErrors(errors);
   }
 });
 
@@ -170,7 +156,7 @@ events.on<{ totalCost: number }>("success:modal-open", (data) => {
     bucketProducts.deleteSelectedProductFromBucket(product.id);
   });
   customer.deleteAllCustomerData();
-  updateBucketCounter();
+  updateHeaderCounter();
 
   modal.render({
     content: orderSuccessView.render({ total: data.totalCost }),
@@ -181,7 +167,7 @@ events.on("success:close", () => {
   modal.close();
 });
 
-events.on("basket:open", () => {
+events.on("bucket:open", () => {
   const bucketContent = bucketTemplate.content.cloneNode(true) as HTMLElement;
   const bucketRoot = bucketContent.querySelector(".basket") as HTMLElement;
 
@@ -197,10 +183,13 @@ events.on("basket:open", () => {
         ".basket__item",
       ) as HTMLElement;
 
-      const bucketItem = new BucketItemView(itemRoot, events);
+      const bucketItem = new BucketItemView(itemRoot, () => {
+        bucketProducts.deleteSelectedProductFromBucket(product.id);
+        updateHeaderCounter();
+        events.emit("bucket:open");
+      });
 
       return bucketItem.render({
-        id: product.id,
         index: index + 1,
         title: product.title,
         price: product.price,
@@ -246,9 +235,31 @@ events.on("contacts:open", () => {
   });
 });
 
+events.on("products:changed", () => {
+  const products = productsModel.getProducts();
+
+  const catalogCardsDOM = products.map((product) => {
+    const cardContent = cardCatalogTemplate.content.cloneNode(
+      true,
+    ) as HTMLElement;
+    const cardRoot = cardContent.querySelector(".card") as HTMLElement;
+    const cardView = new CardCatalogView(cardRoot, () => {
+      events.emit("card:select", { id: product.id });
+    });
+    return cardView.render({
+      title: product.title,
+      image: product.image,
+      category: product.category,
+      price: product.price,
+    });
+  });
+
+  gallery.render({ catalog: catalogCardsDOM });
+});
+
 if (bucketButtonHeader) {
   bucketButtonHeader.addEventListener("click", () => {
-    events.emit("basket:open");
+    events.emit("bucket:open");
   });
 }
 
@@ -256,11 +267,8 @@ async function startApp() {
   try {
     const response = await apiModal.getProductsList();
     productsModel.saveProducts(response.items);
-
-    const products = productsModel.getProducts();
-    catalogView.renderCatalog(products);
   } catch (err) {
-    console.error("Ошибка инициализации приложения:", err);
+    console.error("Ошибка при инициализации приложения:", err);
   }
 }
 

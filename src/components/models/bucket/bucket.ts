@@ -1,11 +1,12 @@
 import { IProduct } from "../../../types";
+import { IEvents } from "../../base/Events";
 
 export class Bucket {
   getSelectedProductInfoBucket(): any {
     throw new Error("Method not implemented.");
   }
   private selectedProducts: IProduct[] = [];
-  constructor() {
+  constructor(private events: IEvents) {
     this.selectedProducts = [];
   }
 
@@ -14,6 +15,7 @@ export class Bucket {
   }
   setSelectedProductIntoBucket(product: IProduct): void {
     this.selectedProducts.push(product);
+    this.events.emit("bucket:open");
   }
 
   deleteSelectedProductFromBucket(id: string): void {
@@ -22,9 +24,12 @@ export class Bucket {
         (product) => product.id !== id,
       );
     }
+    this.events.emit("bucket:open");
   }
+
   deleteAllSelectedProductsFromBucket(): void {
     this.selectedProducts = [];
+    this.events.emit("bucket:open");
   }
   getFullBucketPrice(): number {
     return (

@@ -1,6 +1,6 @@
-import { Component } from "../base/Component";
-import { ensureElement } from "../../utils/utils";
-import { IEvents } from "../base/Events";
+import { Component } from "../../base/Component";
+import { ensureElement } from "../../../utils/utils";
+import { IEvents } from "../../base/Events";
 
 interface IOrderErrors {
   payment?: string;
@@ -80,12 +80,5 @@ export class OrderView extends Component<IOrderErrors> {
     } else {
       this._submitButton.removeAttribute("disabled");
     }
-  }
-
-  render(data?: Partial<IOrderErrors>): HTMLElement {
-    if (data) {
-      this.setErrors(data);
-    }
-    return this.container;
   }
 }

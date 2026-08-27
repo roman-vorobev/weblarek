@@ -1,9 +1,8 @@
 import { Component } from "../base/Component";
-import { IEvents } from "../base/Events";
+
 import { ensureElement } from "../../utils/utils";
 
 interface IBucketItemData {
-  id: string;
   index: number;
   title: string;
   price: number | null;
@@ -14,11 +13,10 @@ export class BucketItemView extends Component<IBucketItemData> {
   private _title: HTMLElement;
   private _price: HTMLElement;
   private _deleteButton: HTMLButtonElement;
-  private _id!: string;
 
   constructor(
     container: HTMLElement,
-    protected events: IEvents,
+    protected onDelete: () => void,
   ) {
     super(container);
 
@@ -35,12 +33,11 @@ export class BucketItemView extends Component<IBucketItemData> {
 
     if (this._deleteButton) {
       this._deleteButton.addEventListener("click", () => {
-        this.events.emit("basket:delete-item", { id: this._id });
+        if (this.onDelete) {
+          this.onDelete();
+        }
       });
     }
-  }
-  set id(value: string) {
-    this._id = value;
   }
 
   set index(value: number) {

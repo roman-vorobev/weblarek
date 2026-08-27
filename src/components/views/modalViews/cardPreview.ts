@@ -1,18 +1,13 @@
-import { CardCatalog } from "./cardCatalogView";
-import { IProduct } from "../../types/index";
-import { ensureElement } from "../../utils/utils";
-import { IEvents } from "../base/Events";
+import { CardCatalogView } from "../cardCatalogView";
+import { ensureElement } from "../../../utils/utils";
 
-interface ICardPreviewData extends IProduct {
-  isInBucket: boolean;
-}
-export class CardPreview extends CardCatalog {
+export class CardPreview extends CardCatalogView {
   private _text: HTMLElement;
   private _button: HTMLButtonElement;
   private _productPrice: HTMLElement;
 
-  constructor(container: HTMLElement, events: IEvents) {
-    super(container, events);
+  constructor(container: HTMLElement, onOrderToggle: () => void) {
+    super(container, () => {});
 
     this._text = ensureElement<HTMLElement>(".card__text", this.container);
     this._button = ensureElement<HTMLButtonElement>(
@@ -27,7 +22,7 @@ export class CardPreview extends CardCatalog {
     if (this._button) {
       this._button.addEventListener("click", (e) => {
         e.stopPropagation();
-        events.emit("preview:basket-toggle", { id: this._id });
+        onOrderToggle();
       });
     }
   }
@@ -61,24 +56,9 @@ export class CardPreview extends CardCatalog {
     }
   }
 
-  render(data: Partial<ICardPreviewData>): HTMLElement {
-    if (data.id) {
-      this._id = data.id;
+  set description(value: string) {
+    if (this._text) {
+      this._text.textContent = value;
     }
-
-    super.render(data as Partial<IProduct>);
-
-    if (data.description !== undefined) {
-      this.text = data.description;
-    }
-
-    if (data.price !== undefined) {
-      this.price = data.price;
-    }
-    if (data.isInBucket !== undefined) {
-      this.isInBucket = data.isInBucket;
-    }
-
-    return this.container;
   }
 }

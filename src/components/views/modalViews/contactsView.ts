@@ -1,6 +1,6 @@
-import { Component } from "../base/Component"; //
-import { ensureElement } from "../../utils/utils";
-import { IEvents } from "../base/Events";
+import { Component } from "../../base/Component"; //
+import { ensureElement } from "../../../utils/utils";
+import { IEvents } from "../../base/Events";
 
 interface IContactsErrors {
   email?: string;
@@ -37,12 +37,18 @@ export class ContactsView extends Component<IContactsErrors> {
 
     this._emailInput.addEventListener("input", (e) => {
       const target = e.target as HTMLInputElement;
-      events.emit("contacts:input", { field: "email", value: target.value });
+      events.emit("contacts:input", {
+        field: "email",
+        value: target.value,
+      });
     });
 
     this._phoneInput.addEventListener("input", (e) => {
       const target = e.target as HTMLInputElement;
-      events.emit("contacts:input", { field: "phone", value: target.value });
+      events.emit("contacts:input", {
+        field: "phone",
+        value: target.value,
+      });
     });
 
     this.container.addEventListener("submit", (e) => {
@@ -60,12 +66,5 @@ export class ContactsView extends Component<IContactsErrors> {
     } else {
       this._submitButton.removeAttribute("disabled");
     }
-  }
-
-  render(data?: Partial<IContactsErrors>): HTMLElement {
-    if (data) {
-      this.setErrors(data);
-    }
-    return this.container;
   }
 }

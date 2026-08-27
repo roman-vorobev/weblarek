@@ -2,16 +2,14 @@ import { Component } from "../../components/base/Component";
 import { CDN_URL } from "../../utils/constants";
 import { ensureElement } from "../../utils/utils";
 import { IProduct } from "../../types/index";
-import { IEvents } from "../base/Events";
 
-export class CardCatalog extends Component<IProduct> {
+export class CardCatalogView extends Component<IProduct> {
   private _title: HTMLElement;
   private _image: HTMLImageElement;
   private _category: HTMLElement;
   private _price: HTMLElement;
-  protected _id!: string;
 
-  constructor(container: HTMLElement, events: IEvents) {
+  constructor(container: HTMLElement, onClick?: () => void) {
     super(container);
 
     this._title = ensureElement<HTMLElement>(".card__title", this.container);
@@ -25,18 +23,11 @@ export class CardCatalog extends Component<IProduct> {
     );
     this._price = ensureElement<HTMLElement>(".card__price", this.container);
 
-    this.container.addEventListener("click", () => {
-      if (this._id) {
-        events.emit("card:select", { id: this._id });
-      }
-    });
-  }
-
-  render(data: Partial<IProduct>): HTMLElement {
-    if (data.id) {
-      this._id = data.id;
+    if (onClick) {
+      this.container.addEventListener("click", () => {
+        onClick();
+      });
     }
-    return super.render(data);
   }
 
   set title(value: string) {

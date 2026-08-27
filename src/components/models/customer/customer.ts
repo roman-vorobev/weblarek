@@ -1,11 +1,12 @@
 import { ICustomer, TPayment, TFormErrors } from "../../../types";
+import { IEvents } from "../../base/Events";
 
 export class Customer {
   private payment: TPayment | null = null;
   private email: string = "";
   private phone: string = "";
   private address: string = "";
-  constructor() {}
+  constructor(private events: IEvents) {}
 
   getAllCustomerData(): ICustomer {
     return {
@@ -20,6 +21,7 @@ export class Customer {
     this.email = "";
     this.phone = "";
     this.address = "";
+    this.events.emit("contacts:submit");
   }
   validateForm(): TFormErrors {
     const errors: TFormErrors = {};
@@ -55,5 +57,6 @@ export class Customer {
     } else {
       (this as any)[field] = value;
     }
+    this.events.emit("customer-data:changed");
   }
 }
