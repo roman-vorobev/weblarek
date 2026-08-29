@@ -21,7 +21,7 @@ export class Customer {
     this.email = "";
     this.phone = "";
     this.address = "";
-    this.events.emit("contacts:submit");
+    this.events.emit("customer-data:changed");
   }
   validateForm(): TFormErrors {
     const errors: TFormErrors = {};
@@ -49,10 +49,6 @@ export class Customer {
 
   setInputData(field: keyof ICustomer, value: string | TPayment): void {
     if (field === "payment") {
-      if (!this.validPayments.includes(value as TPayment)) {
-        console.log(`Невалидное значение для payment: ${value}`);
-        return;
-      }
       this.payment = value as TPayment;
     } else {
       (this as any)[field] = value;

@@ -13,9 +13,10 @@ export class Bucket {
   getBucketProducts(): IProduct[] {
     return this.selectedProducts;
   }
+
   setSelectedProductIntoBucket(product: IProduct): void {
     this.selectedProducts.push(product);
-    this.events.emit("bucket:open");
+    this.events.emit("bucket:changed");
   }
 
   deleteSelectedProductFromBucket(id: string): void {
@@ -24,12 +25,12 @@ export class Bucket {
         (product) => product.id !== id,
       );
     }
-    this.events.emit("bucket:open");
+    this.events.emit("bucket:changed");
   }
 
   deleteAllSelectedProductsFromBucket(): void {
     this.selectedProducts = [];
-    this.events.emit("bucket:open");
+    this.events.emit("bucket:changed");
   }
   getFullBucketPrice(): number {
     return (

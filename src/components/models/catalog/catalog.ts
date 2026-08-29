@@ -3,10 +3,10 @@ import { IEvents } from "../../base/Events";
 
 export class Catalog {
   protected products: IProduct[];
-  protected selectedProduct: IProduct | undefined;
+  protected selectedProduct: IProduct | null;
   constructor(private events: IEvents) {
     this.products = [];
-    this.selectedProduct = undefined;
+    this.selectedProduct = null;
   }
 
   public saveProducts(products: IProduct[]): void {
@@ -19,11 +19,11 @@ export class Catalog {
   public getProductByID(id: string): IProduct | undefined {
     return this.products.find((product) => product.id == id);
   }
-  public saveProduct(id: string): void {
-    this.selectedProduct = this.getProductByID(id);
-    this.events.emit("products:changed");
+  public saveProduct(product: IProduct): void {
+    this.selectedProduct = product;
+    this.events.emit("preview:changed");
   }
-  public getSelectedProduct(): IProduct | undefined {
+  public getSelectedProduct(): IProduct | null {
     return this.selectedProduct;
   }
 }
