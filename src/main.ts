@@ -97,7 +97,7 @@ events.on("preview:changed", () => {
         price: selectedProduct.price,
         buttonText: textForButton,
         buttonDisabled: isButtonDisabled,
-      } as any),
+      }),
     });
 
     modal.open();
@@ -168,9 +168,9 @@ events.on("customer-data:changed", () => {
   }
   if (orderView) {
     orderView.render({
-      address: customerData.address || "",
-      payment: customerData.payment || null,
-    } as Record<string, unknown>);
+      address: customerData.address,
+      payment: customerData.payment,
+    });
 
     orderView.setValid(isOrderValid);
     const visibleOrderErrors: any = {};
@@ -183,9 +183,9 @@ events.on("customer-data:changed", () => {
 
   if (contactsView) {
     contactsView.render({
-      phone: customerData.phone || "",
-      email: customerData.email || "",
-    } as Record<string, unknown>);
+      phone: customerData.phone,
+      email: customerData.email,
+    });
 
     contactsView.setValid(isContactsValid);
     const visibleContactErrors: any = {};

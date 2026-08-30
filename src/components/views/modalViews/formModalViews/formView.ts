@@ -36,17 +36,6 @@ export abstract class FormView<T> extends Component<T> {
         this.onInputChange(target.name, target.value);
       }
     });
-
-    this.container.addEventListener(
-      "blur",
-      (e) => {
-        const target = e.target as HTMLInputElement;
-        if (target.tagName === "INPUT" && target.name) {
-          this.events.emit(`${target.name}:blur`);
-        }
-      },
-      true,
-    );
   }
 
   protected abstract onInputChange(field: string, value: string): void;

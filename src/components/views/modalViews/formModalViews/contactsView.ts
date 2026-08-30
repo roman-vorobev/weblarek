@@ -2,12 +2,12 @@ import { FormView } from "./formView";
 import { ensureElement } from "../../../../utils/utils";
 import { IEvents } from "../../../base/Events";
 
-interface IContactsErrors {
-  email?: string;
-  phone?: string;
+interface IContacts {
+  email: string;
+  phone: string;
 }
 
-export class ContactsView extends FormView<IContactsErrors> {
+export class ContactsView extends FormView<IContacts> {
   private _emailInput: HTMLInputElement;
   private _phoneInput: HTMLInputElement;
 
@@ -37,14 +37,5 @@ export class ContactsView extends FormView<IContactsErrors> {
     if (this._emailInput) {
       this._emailInput.value = value;
     }
-    this._emailInput.addEventListener("input", (e) => {
-      const target = e.target as HTMLInputElement;
-      this.events.emit("form:change", { field: "email", value: target.value });
-    });
-
-    this._phoneInput.addEventListener("input", (e) => {
-      const target = e.target as HTMLInputElement;
-      this.events.emit("form:change", { field: "phone", value: target.value });
-    });
   }
 }

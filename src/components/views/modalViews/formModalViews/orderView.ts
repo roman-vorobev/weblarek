@@ -1,13 +1,14 @@
 import { FormView } from "./formView";
 import { ensureElement } from "../../../../utils/utils";
 import { IEvents } from "../../../base/Events";
+import { TPayment } from "../../../../types";
 
-interface IOrderErrors {
-  payment?: string;
-  address?: string;
+interface IOrder {
+  payment: TPayment | null;
+  address: string;
 }
 
-export class OrderView extends FormView<IOrderErrors> {
+export class OrderView extends FormView<IOrder> {
   private _cardButton: HTMLButtonElement;
   private _cashButton: HTMLButtonElement;
   private _addressInput: HTMLInputElement;
@@ -54,7 +55,7 @@ export class OrderView extends FormView<IOrderErrors> {
     }
   }
 
-  set payment(value: string | null) {
+  set payment(value: TPayment | null) {
     if (!this._cardButton || !this._cashButton) return;
 
     if (value === "card") {
